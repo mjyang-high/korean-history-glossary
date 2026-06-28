@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
 import { HistoryMotifRow } from '@/components/HistoryMotifs';
+import { SchoolBadge } from '@/components/SchoolBadge';
 
 interface ContextSnippet {
   book: string;
@@ -167,9 +168,11 @@ export default function Home() {
             <p className="mt-3 max-w-2xl text-sm text-[#1c1a16]/65">
               교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
             </p>
-            <p className="mt-1 text-xs text-[#1c1a16]/40">분당대진고등학교 · 양민정</p>
           </div>
-          <HistoryMotifRow className="hidden shrink-0 sm:flex" />
+          <div className="flex shrink-0 flex-col items-end gap-3">
+            <SchoolBadge />
+            <HistoryMotifRow className="hidden sm:flex" />
+          </div>
         </div>
 
         <div className="mt-5 h-1.5 w-full rounded-full bg-gradient-to-r from-[#c1392d] via-[#1c1a16]/15 to-[#1f7a7a]" />
