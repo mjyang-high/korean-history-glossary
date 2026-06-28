@@ -1,11 +1,15 @@
 // 사용법: data/source-pdf/ 폴더에 PDF를 넣고 `npm run extract-pdf` 실행
 import fs from 'fs';
 import path from 'path';
-// @ts-expect-error - pdf-parse has no proper ESM types for internal lib path
-import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+import { fileURLToPath } from 'url';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { clearPages, insertPage } from '../lib/db';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const SOURCE_DIR = path.join(process.cwd(), 'data', 'source-pdf');
+const CMAP_URL = path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'cmaps') + path.sep;
 
 // 교과서 단원 제목으로 흔히 쓰이는 패턴들 (해냄에듀 한국사1/2 기준 휴리스틱)
 const UNIT_PATTERNS = [
@@ -26,29 +30,29 @@ function detectUnit(pageText: string): string | null {
 }
 
 async function extractBook(filePath: string, bookName: string) {
-  const dataBuffer = fs.readFileSync(filePath);
-  const pageTexts: string[] = [];
-
-  await pdfParse(dataBuffer, {
-    pagerender: async (pageData: any) => {
-      const textContent = await pageData.getTextContent();
-      const text = textContent.items.map((item: any) => item.str).join(' ');
-      pageTexts.push(text);
-      return text;
-    },
-  });
+  const data = new Uint8Array(fs.readFileSync(filePath));
+  const doc = await pdfjsLib.getDocument({
+    data,
+    cMapUrl: CMAP_URL,
+    cMapPacked: true,
+    standardFontDataUrl: path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'standard_fonts') + path.sep,
+    useSystemFonts: true,
+    disableFontFace: true,
+  }).promise;
 
   let lastUnit: string | null = null;
 
-  for (let idx = 0; idx < pageTexts.length; idx++) {
-    const text = pageTexts[idx];
-    const pageNo = idx + 1;
+  for (let pageNo = 1; pageNo <= doc.numPages; pageNo++) {
+    const page = await doc.getPage(pageNo);
+    const textContent = await page.getTextContent();
+    const text = textContent.items.map((item: any) => item.str).join(' ');
+
     const detected = detectUnit(text);
     if (detected) lastUnit = detected;
     await insertPage(bookName, pageNo, lastUnit, text);
   }
 
-  console.log(`${bookName}: ${pageTexts.length}페이지 저장 완료`);
+  console.log(`${bookName}: ${doc.numPages}페이지 저장 완료`);
 }
 
 async function main() {

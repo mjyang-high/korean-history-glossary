@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --paper: #f4efe3;
+  --ink: #1c1a16;
+  --brick: #c1392d;
+  --teal: #1f7a7a;
+}
+
 body {
-  background: #f5f6fa;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-serif-kr), serif;
 }

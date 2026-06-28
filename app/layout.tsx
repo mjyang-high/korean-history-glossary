@@ -1,5 +1,13 @@
 import type { Metadata } from 'next';
+import { Noto_Serif_KR } from 'next/font/google';
 import './globals.css';
+
+const notoSerifKr = Noto_Serif_KR({
+  subsets: ['latin'],
+  weight: ['500', '700', '900'],
+  variable: '--font-serif-kr',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: '한국사 용어 도우미',
@@ -9,7 +17,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body className={notoSerifKr.variable}>{children}</body>
     </html>
   );
 }

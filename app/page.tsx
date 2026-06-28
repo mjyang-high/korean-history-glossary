@@ -28,6 +28,26 @@ interface TopTerm {
   count: number;
 }
 
+function CornerMark({ className = '' }: { className?: string }) {
+  return (
+    <span
+      className={`pointer-events-none absolute h-2.5 w-2.5 rotate-45 border border-[#1c1a16]/70 bg-[#f4efe3] ${className}`}
+    />
+  );
+}
+
+function FrameCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`relative rounded-[28px] border-[3px] border-[#1c1a16]/85 bg-[#fbf8f0] ${className}`}>
+      <CornerMark className="-left-1 -top-1" />
+      <CornerMark className="-right-1 -top-1" />
+      <CornerMark className="-bottom-1 -left-1" />
+      <CornerMark className="-bottom-1 -right-1" />
+      {children}
+    </div>
+  );
+}
+
 export default function Home() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [password, setPassword] = useState('');
@@ -107,66 +127,81 @@ export default function Home() {
   }
 
   if (authed === null) {
-    return <div className="flex h-screen items-center justify-center text-gray-400">로딩 중...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#f4efe3] text-[#1c1a16]/40 font-display">
+        로딩 중...
+      </div>
+    );
   }
 
   if (!authed) {
     return (
-      <main className="flex h-screen items-center justify-center bg-gray-50">
-        <form
-          onSubmit={handleLogin}
-          className="w-80 rounded-2xl bg-white p-8 shadow-md flex flex-col gap-4"
-        >
-          <h1 className="text-lg font-bold text-gray-800">한국사 용어 도우미</h1>
-          <p className="text-sm text-gray-500">반 비밀번호를 입력하면 검색할 수 있어요.</p>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="비밀번호"
-            className="rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-400"
-          />
-          {authError && <p className="text-sm text-red-500">{authError}</p>}
-          <button
-            type="submit"
-            className="rounded-lg bg-blue-500 py-2 font-medium text-white hover:bg-blue-600"
-          >
-            입장하기
-          </button>
-        </form>
+      <main className="flex h-screen items-center justify-center bg-[#f4efe3] px-4">
+        <FrameCard className="w-full max-w-sm p-8">
+          <span className="mx-auto mb-6 block w-fit rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
+            반 전용 입장
+          </span>
+          <h1 className="font-display text-center text-3xl font-black leading-tight">
+            한국사<br />용어 도우미
+          </h1>
+          <p className="mt-3 text-center text-sm text-[#1c1a16]/60">
+            반 비밀번호를 입력하면 검색할 수 있어요.
+          </p>
+          <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-3">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="rounded-xl border-2 border-[#1c1a16]/30 bg-white px-4 py-2.5 outline-none focus:border-[#c1392d]"
+            />
+            {authError && <p className="text-sm text-[#c1392d]">{authError}</p>}
+            <button
+              type="submit"
+              className="rounded-xl bg-[#c1392d] py-2.5 font-display font-bold text-white transition hover:bg-[#a52f25]"
+            >
+              입장하기
+            </button>
+          </form>
+        </FrameCard>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-2 text-2xl font-bold text-gray-800">한국사 용어 도우미</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
-      </p>
+      <FrameCard className="mb-8 px-6 py-7 sm:px-10">
+        <span className="mb-3 inline-block rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
+          교실 검정 · 용어 도우미
+        </span>
+        <h1 className="font-display text-3xl font-black sm:text-4xl">한국사 용어 도우미</h1>
+        <p className="mt-2 max-w-2xl text-sm text-[#1c1a16]/65">
+          교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
+        </p>
 
-      <form onSubmit={handleSearch} className="mb-8 flex gap-2">
-        <input
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-          placeholder="예: 공화정"
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-400"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-lg bg-blue-500 px-6 py-3 font-medium text-white hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading ? '검색 중...' : '검색'}
-        </button>
-      </form>
+        <form onSubmit={handleSearch} className="mt-6 flex gap-2">
+          <input
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            placeholder="예: 공화정"
+            className="flex-1 rounded-xl border-2 border-[#1c1a16]/30 bg-white px-4 py-3 outline-none focus:border-[#1f7a7a]"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-xl bg-[#1f7a7a] px-6 py-3 font-display font-bold text-white transition hover:bg-[#176161] disabled:opacity-50"
+          >
+            {loading ? '검색 중...' : '검색'}
+          </button>
+        </form>
 
-      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+        {error && <p className="mt-3 text-sm text-[#c1392d]">{error}</p>}
+      </FrameCard>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[2fr_1fr]">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {results.length === 0 && (
-            <p className="text-sm text-gray-400">검색 결과가 여기에 카드로 표시돼요.</p>
+            <p className="px-2 text-sm text-[#1c1a16]/40">검색 결과가 여기에 카드로 표시돼요.</p>
           )}
 
           {results.map((r) => (
@@ -174,23 +209,26 @@ export default function Home() {
           ))}
         </div>
 
-        <aside className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="mb-3 font-bold text-gray-700">학생들이 많이 검색한 단어 TOP 10</h2>
+        <FrameCard className="p-5">
+          <h2 className="font-display mb-3 font-bold text-[#1c1a16]">
+            학생들이 많이 검색한 단어 <span className="text-[#c1392d]">TOP 10</span>
+          </h2>
           {topTerms.length === 0 ? (
-            <p className="text-sm text-gray-400">아직 검색 기록이 없어요.</p>
+            <p className="text-sm text-[#1c1a16]/40">아직 검색 기록이 없어요.</p>
           ) : (
-            <ol className="flex flex-col gap-2">
+            <ol className="flex flex-col gap-2.5">
               {topTerms.map((t, idx) => (
-                <li key={t.term} className="flex justify-between text-sm text-gray-600">
-                  <span>
-                    {idx + 1}. {t.term}
+                <li key={t.term} className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <span className="font-display font-bold text-[#c1392d]">{idx + 1}</span>
+                    <span className="text-[#1c1a16]/80">{t.term}</span>
                   </span>
-                  <span className="text-gray-400">{t.count}회</span>
+                  <span className="text-[#1c1a16]/40">{t.count}회</span>
                 </li>
               ))}
             </ol>
           )}
-        </aside>
+        </FrameCard>
       </div>
     </main>
   );
@@ -199,49 +237,49 @@ export default function Home() {
 function ResultCard({ result }: { result: SearchResult }) {
   if (result.notFound) {
     return (
-      <div className="rounded-2xl bg-white p-5 shadow-sm">
-        <h3 className="font-bold text-gray-800">{result.term}</h3>
-        <p className="mt-2 text-sm text-gray-500">교과서에서 이 단어를 찾지 못했어요.</p>
-      </div>
+      <FrameCard className="p-5">
+        <h3 className="font-display font-bold text-[#1c1a16]">{result.term}</h3>
+        <p className="mt-2 text-sm text-[#1c1a16]/50">교과서에서 이 단어를 찾지 못했어요.</p>
+      </FrameCard>
     );
   }
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-gray-800">{result.term}</h3>
+    <FrameCard className="p-5 sm:p-6">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-display text-xl font-black text-[#1c1a16]">{result.term}</h3>
         {result.cached && (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+          <span className="rounded-full border border-[#1c1a16]/20 px-2 py-0.5 text-xs text-[#1c1a16]/50">
             저장된 설명
           </span>
         )}
       </div>
 
-      <p className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
+      <p className="whitespace-pre-line text-sm leading-relaxed text-[#1c1a16]/85">
         {result.explanation}
       </p>
 
       {result.examInfo && (
-        <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+        <div className="mt-3 rounded-lg border border-[#c1392d]/30 bg-[#c1392d]/[0.06] p-3 text-sm text-[#8c2a21]">
           📌 최근 5개년 수능 기출 연계: {result.examInfo.recentExamInfo}
         </div>
       )}
 
       {result.contexts && result.contexts.length > 0 && (
-        <details className="mt-3 text-sm text-gray-500">
-          <summary className="cursor-pointer text-blue-500">교과서 원문 보기</summary>
+        <details className="mt-3 text-sm text-[#1c1a16]/60">
+          <summary className="cursor-pointer font-medium text-[#1f7a7a]">교과서 원문 보기</summary>
           <ul className="mt-2 flex flex-col gap-2">
             {result.contexts.map((c, idx) => (
-              <li key={idx} className="rounded-lg bg-gray-50 p-2">
-                <span className="font-medium text-gray-600">
+              <li key={idx} className="rounded-lg border border-[#1c1a16]/10 bg-white p-2.5">
+                <span className="font-medium text-[#1c1a16]/70">
                   {c.book} {c.pageNo}쪽{c.unit ? ` · ${c.unit}` : ''}
                 </span>
-                <p className="mt-1 text-gray-500">...{c.snippet}...</p>
+                <p className="mt-1 text-[#1c1a16]/55">...{c.snippet}...</p>
               </li>
             ))}
           </ul>
         </details>
       )}
-    </div>
+    </FrameCard>
   );
 }
