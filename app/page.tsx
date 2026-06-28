@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
+import { HistoryMotifRow } from '@/components/HistoryMotifs';
 
 interface ContextSnippet {
   book: string;
@@ -153,14 +154,25 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <FrameCard className="mb-8 px-6 py-7 sm:px-10">
-        <span className="mb-3 inline-block rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
-          교과서 내 · 용어 도우미
-        </span>
-        <h1 className="font-display text-3xl font-black sm:text-4xl">한국사 용어 도우미</h1>
-        <p className="mt-2 max-w-2xl text-sm text-[#1c1a16]/65">
-          교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
-        </p>
-        <p className="mt-1 text-xs text-[#1c1a16]/40">분당대진고등학교 · 양민정</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
+              <span>교과서 내</span>
+              <span className="text-[10px] text-[#1c1a16]/40">용어 도우미</span>
+            </span>
+            <h1 className="font-display text-3xl font-black leading-none sm:text-5xl">
+              한국사<span className="ml-2 text-[#c1392d]">·</span>
+              <span className="text-[#1f7a7a]">용어</span> 도우미
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-[#1c1a16]/65">
+              교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
+            </p>
+            <p className="mt-1 text-xs text-[#1c1a16]/40">분당대진고등학교 · 양민정</p>
+          </div>
+          <HistoryMotifRow className="hidden shrink-0 sm:flex" />
+        </div>
+
+        <div className="mt-5 h-1.5 w-full rounded-full bg-gradient-to-r from-[#c1392d] via-[#1c1a16]/15 to-[#1f7a7a]" />
 
         <form onSubmit={handleSearch} className="mt-6 flex gap-2">
           <input

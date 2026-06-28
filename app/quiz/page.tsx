@@ -213,11 +213,15 @@ export default function QuizPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <FrameCard className="p-6 sm:p-8">
-        <span className="mb-3 inline-block rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
-          모의고사 대비
+        <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
+          <span>모의고사 대비</span>
+          <span className="text-[10px] text-[#1c1a16]/40">기출문제</span>
         </span>
-        <h1 className="font-display text-3xl font-black">기출문제 풀어보기</h1>
+        <h1 className="font-display text-3xl font-black">
+          기출문제 <span className="text-[#c1392d]">풀어보기</span>
+        </h1>
         <p className="mt-2 text-sm text-[#1c1a16]/65">회차를 고르고, 오답률 TOP5 또는 전체 20문제 중 선택하세요.</p>
+        <div className="mt-4 h-1.5 w-full rounded-full bg-gradient-to-r from-[#c1392d] via-[#1c1a16]/15 to-[#1f7a7a]" />
 
         <div className="mt-6">
           <p className="font-display mb-2 text-sm font-bold">회차 선택</p>
