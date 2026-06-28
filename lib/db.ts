@@ -54,6 +54,21 @@ export async function ensureSchema() {
     )
   `;
 
+  await sql`
+    CREATE TABLE IF NOT EXISTS exam_questions (
+      id TEXT PRIMARY KEY,
+      year INTEGER NOT NULL,
+      month INTEGER,
+      exam_name TEXT NOT NULL,
+      number INTEGER NOT NULL,
+      stem TEXT NOT NULL,
+      choices_json TEXT NOT NULL,
+      answer INTEGER,
+      explanation TEXT NOT NULL
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_exam_questions_round ON exam_questions(year, month)`;
+
   initialized = true;
 }
 
@@ -130,4 +145,54 @@ export async function getTopTerms(limit = 10): Promise<SearchCountRow[]> {
     SELECT term, count FROM search_counts ORDER BY count DESC, term ASC LIMIT ${limit}
   `;
   return rows as unknown as SearchCountRow[];
+}
+
+export interface ExamQuestionRow {
+  id: string;
+  year: number;
+  month: number | null;
+  exam_name: string;
+  number: number;
+  stem: string;
+  choices_json: string;
+  answer: number | null;
+  explanation: string;
+}
+
+export async function clearExamQuestions() {
+  await ensureSchema();
+  await sql`DELETE FROM exam_questions`;
+}
+
+export async function insertExamQuestion(q: {
+  id: string;
+  year: number;
+  month: number | null;
+  examName: string;
+  number: number;
+  stem: string;
+  choices: string[];
+  answer: number | null;
+  explanation: string;
+}) {
+  await ensureSchema();
+  await sql`
+    INSERT INTO exam_questions (id, year, month, exam_name, number, stem, choices_json, answer, explanation)
+    VALUES (${q.id}, ${q.year}, ${q.month}, ${q.examName}, ${q.number}, ${q.stem}, ${JSON.stringify(q.choices)}, ${q.answer}, ${q.explanation})
+    ON CONFLICT (id) DO UPDATE SET
+      year = EXCLUDED.year,
+      month = EXCLUDED.month,
+      exam_name = EXCLUDED.exam_name,
+      number = EXCLUDED.number,
+      stem = EXCLUDED.stem,
+      choices_json = EXCLUDED.choices_json,
+      answer = EXCLUDED.answer,
+      explanation = EXCLUDED.explanation
+  `;
+}
+
+export async function getAllExamQuestions(): Promise<ExamQuestionRow[]> {
+  await ensureSchema();
+  const rows = await sql`SELECT * FROM exam_questions ORDER BY year DESC, month DESC, number ASC`;
+  return rows as unknown as ExamQuestionRow[];
 }

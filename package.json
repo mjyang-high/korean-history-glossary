@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "extract-pdf": "node --env-file=.env.local --import tsx scripts/extract-pdf.ts"
+    "extract-pdf": "node --env-file=.env.local --import tsx scripts/extract-pdf.ts",
+    "parse-exam-pdfs": "node --import tsx scripts/parse-exam-pdfs.ts",
+    "load-exam-questions": "node --env-file=.env.local --import tsx scripts/load-exam-questions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

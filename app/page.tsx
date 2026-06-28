@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { FrameCard } from '@/components/FrameCard';
 
 interface ContextSnippet {
   book: string;
@@ -26,26 +28,6 @@ interface SearchResult {
 interface TopTerm {
   term: string;
   count: number;
-}
-
-function CornerMark({ className = '' }: { className?: string }) {
-  return (
-    <span
-      className={`pointer-events-none absolute h-2.5 w-2.5 rotate-45 border border-[#1c1a16]/70 bg-[#f4efe3] ${className}`}
-    />
-  );
-}
-
-function FrameCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-[28px] border-[3px] border-[#1c1a16]/85 bg-[#fbf8f0] ${className}`}>
-      <CornerMark className="-left-1 -top-1" />
-      <CornerMark className="-right-1 -top-1" />
-      <CornerMark className="-bottom-1 -left-1" />
-      <CornerMark className="-bottom-1 -right-1" />
-      {children}
-    </div>
-  );
 }
 
 export default function Home() {
@@ -197,6 +179,23 @@ export default function Home() {
 
         {error && <p className="mt-3 text-sm text-[#c1392d]">{error}</p>}
       </FrameCard>
+
+      <Link href="/quiz">
+        <FrameCard className="mb-8 flex items-center justify-between gap-4 px-6 py-6 transition hover:bg-[#f4efe3] sm:px-10">
+          <div>
+            <span className="mb-2 inline-block rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
+              모의고사 대비
+            </span>
+            <h2 className="font-display text-2xl font-black">기출문제 풀어보기</h2>
+            <p className="mt-1 text-sm text-[#1c1a16]/65">
+              모의고사 전날, 오답률 TOP5 또는 전체 20문제를 카드 한 장씩 풀고 바로 채점·해설까지!
+            </p>
+          </div>
+          <span className="font-display shrink-0 rounded-xl bg-[#1c1a16] px-5 py-3 font-bold text-white">
+            시작하기 →
+          </span>
+        </FrameCard>
+      </Link>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[2fr_1fr]">
         <div className="flex flex-col gap-5">

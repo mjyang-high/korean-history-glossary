@@ -2,6 +2,8 @@ node_modules
 .next
 .env.local
 data/source-pdf/*.pdf
+data/exam-pdf/*.pdf
+data/exam_questions.json
 data/app.db
 data/app.db-journal
 .claude/settings.local.json
