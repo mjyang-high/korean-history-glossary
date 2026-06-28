@@ -1,0 +1,7 @@
+node_modules
+.next
+.env.local
+data/source-pdf/*.pdf
+data/app.db
+data/app.db-journal
+.claude/settings.local.json

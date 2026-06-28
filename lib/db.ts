@@ -1,0 +1,133 @@
+import { neon } from '@neondatabase/serverless';
+
+type SqlFn = ReturnType<typeof neon>;
+let _sql: SqlFn | null = null;
+
+function getSql(): SqlFn {
+  if (!_sql) {
+    const connectionString =
+      process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? process.env.POSTGRES_URL_NON_POOLING;
+    if (!connectionString) {
+      throw new Error(
+        'DATABASE_URL(또는 POSTGRES_URL)이 설정되지 않았습니다. Vercel Postgres(Neon) 연결 문자열을 .env.local에 넣어주세요.'
+      );
+    }
+    _sql = neon(connectionString);
+  }
+  return _sql;
+}
+
+function sql(strings: TemplateStringsArray, ...values: unknown[]) {
+  return getSql()(strings, ...values);
+}
+
+let initialized = false;
+
+export async function ensureSchema() {
+  if (initialized) return;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS pages (
+      id SERIAL PRIMARY KEY,
+      book TEXT NOT NULL,
+      page_no INTEGER NOT NULL,
+      unit TEXT,
+      content TEXT NOT NULL
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_pages_book_page ON pages(book, page_no)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS term_cache (
+      term TEXT PRIMARY KEY,
+      explanation TEXT NOT NULL,
+      contexts_json TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS search_counts (
+      term TEXT PRIMARY KEY,
+      count INTEGER NOT NULL DEFAULT 0,
+      last_searched_at TIMESTAMPTZ
+    )
+  `;
+
+  initialized = true;
+}
+
+export async function clearPages() {
+  await ensureSchema();
+  await sql`DELETE FROM pages`;
+}
+
+export async function insertPage(book: string, pageNo: number, unit: string | null, content: string) {
+  await ensureSchema();
+  await sql`INSERT INTO pages (book, page_no, unit, content) VALUES (${book}, ${pageNo}, ${unit}, ${content})`;
+}
+
+export interface PageRow {
+  id: number;
+  book: string;
+  page_no: number;
+  unit: string | null;
+  content: string;
+}
+
+export async function findPagesContaining(term: string): Promise<PageRow[]> {
+  await ensureSchema();
+  const rows = await sql`
+    SELECT * FROM pages WHERE content ILIKE ${'%' + term + '%'} ORDER BY book, page_no
+  `;
+  return rows as unknown as PageRow[];
+}
+
+export interface TermCacheRow {
+  term: string;
+  explanation: string;
+  contexts_json: string;
+  created_at: string;
+}
+
+export async function getCachedTerm(term: string): Promise<TermCacheRow | undefined> {
+  await ensureSchema();
+  const rows = await sql`SELECT * FROM term_cache WHERE term = ${term}`;
+  return (rows as unknown as TermCacheRow[])[0];
+}
+
+export async function setCachedTerm(term: string, explanation: string, contextsJson: string) {
+  await ensureSchema();
+  await sql`
+    INSERT INTO term_cache (term, explanation, contexts_json, created_at)
+    VALUES (${term}, ${explanation}, ${contextsJson}, now())
+    ON CONFLICT (term) DO UPDATE SET
+      explanation = EXCLUDED.explanation,
+      contexts_json = EXCLUDED.contexts_json,
+      created_at = EXCLUDED.created_at
+  `;
+}
+
+export async function incrementSearchCount(term: string) {
+  await ensureSchema();
+  await sql`
+    INSERT INTO search_counts (term, count, last_searched_at)
+    VALUES (${term}, 1, now())
+    ON CONFLICT (term) DO UPDATE SET
+      count = search_counts.count + 1,
+      last_searched_at = now()
+  `;
+}
+
+export interface SearchCountRow {
+  term: string;
+  count: number;
+}
+
+export async function getTopTerms(limit = 10): Promise<SearchCountRow[]> {
+  await ensureSchema();
+  const rows = await sql`
+    SELECT term, count FROM search_counts ORDER BY count DESC, term ASC LIMIT ${limit}
+  `;
+  return rows as unknown as SearchCountRow[];
+}
