@@ -10,5 +10,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/api/search', '/api/top-terms', '/api/exam-rounds', '/api/exam-questions', '/api/exam-page-image'],
+  matcher: ['/api/search', '/api/top-terms', '/api/exam-rounds', '/api/exam-questions', '/api/exam-question-image'],
 };

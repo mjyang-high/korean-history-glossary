@@ -72,11 +72,8 @@ export async function ensureSchema() {
   await sql`ALTER TABLE exam_questions ADD COLUMN IF NOT EXISTS page_no INTEGER`;
 
   await sql`
-    CREATE TABLE IF NOT EXISTS exam_pages (
+    CREATE TABLE IF NOT EXISTS exam_question_images (
       id TEXT PRIMARY KEY,
-      year INTEGER NOT NULL,
-      month INTEGER,
-      page_no INTEGER NOT NULL,
       image_base64 TEXT NOT NULL
     )
   `;
@@ -212,28 +209,24 @@ export async function getAllExamQuestions(): Promise<ExamQuestionRow[]> {
   return rows as unknown as ExamQuestionRow[];
 }
 
-export async function clearExamPages() {
+export async function clearExamQuestionImages() {
   await ensureSchema();
-  await sql`DELETE FROM exam_pages`;
+  await sql`DELETE FROM exam_question_images`;
 }
 
-export async function insertExamPage(id: string, year: number, month: number | null, pageNo: number, imageBase64: string) {
+export async function insertExamQuestionImage(id: string, imageBase64: string) {
   await ensureSchema();
   await sql`
-    INSERT INTO exam_pages (id, year, month, page_no, image_base64)
-    VALUES (${id}, ${year}, ${month}, ${pageNo}, ${imageBase64})
+    INSERT INTO exam_question_images (id, image_base64)
+    VALUES (${id}, ${imageBase64})
     ON CONFLICT (id) DO UPDATE SET
-      year = EXCLUDED.year,
-      month = EXCLUDED.month,
-      page_no = EXCLUDED.page_no,
       image_base64 = EXCLUDED.image_base64
   `;
 }
 
-export async function getExamPageImage(year: number, month: number | null, pageNo: number): Promise<string | null> {
+export async function getExamQuestionImage(id: string): Promise<string | null> {
   await ensureSchema();
-  const id = `${year}-${month ?? 'csat'}-${pageNo}`;
-  const rows = await sql`SELECT image_base64 FROM exam_pages WHERE id = ${id}`;
+  const rows = await sql`SELECT image_base64 FROM exam_question_images WHERE id = ${id}`;
   const row = (rows as unknown as { image_base64: string }[])[0];
   return row ? row.image_base64 : null;
 }

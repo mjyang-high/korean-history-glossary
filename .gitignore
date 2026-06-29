@@ -6,6 +6,7 @@ data/exam-pdf/*.pdf
 data/exam_questions.json
 data/exam_rounds_meta.json
 data/exam-page-images/
+data/exam-question-images/
 data/app.db
 data/app.db-journal
 .claude/settings.local.json

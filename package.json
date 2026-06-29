@@ -9,6 +9,7 @@
     "lint": "next lint",
     "extract-pdf": "node --env-file=.env.local --import tsx scripts/extract-pdf.ts",
     "parse-exam-pdfs": "node --import tsx scripts/parse-exam-pdfs.ts",
+    "render-exam-pages": "node --import tsx scripts/render-exam-pages.ts",
     "load-exam-questions": "node --env-file=.env.local --import tsx scripts/load-exam-questions.ts"
   },
   "dependencies": {

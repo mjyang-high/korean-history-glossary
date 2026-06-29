@@ -40,6 +40,11 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [imgOk, setImgOk] = useState(true);
+
+  useEffect(() => {
+    setImgOk(true);
+  }, [index]);
   const [correctCount, setCorrectCount] = useState(0);
 
   useEffect(() => {
@@ -161,14 +166,15 @@ export default function QuizPage() {
         </div>
 
         <FrameCard className="p-6 sm:p-8">
-          {q.pageNo && (
+          {imgOk && (
             <div className="mb-4">
-              <p className="mb-1.5 text-xs text-[#1c1a16]/40">원본 문제지 (사진ㆍ지도ㆍ표 포함)</p>
+              <p className="mb-1.5 text-xs text-[#1c1a16]/40">사진ㆍ지도ㆍ표 자료</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`/api/exam-page-image?year=${q.year}&month=${q.month ?? 'csat'}&page=${q.pageNo}`}
-                alt={`${q.examName} ${q.pageNo}페이지 원본`}
+                src={`/api/exam-question-image?id=${q.id}`}
+                alt={`${q.examName} ${q.number}번 자료`}
                 className="w-full rounded-lg border border-[#1c1a16]/15"
+                onError={() => setImgOk(false)}
               />
             </div>
           )}

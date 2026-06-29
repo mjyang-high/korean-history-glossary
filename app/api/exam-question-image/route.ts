@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AUTH_COOKIE_NAME, isValidAuthToken } from '@/lib/auth';
-import { getExamPageImage } from '@/lib/db';
+import { getExamQuestionImage } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,16 +11,13 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const year = Number(searchParams.get('year'));
-  const monthParam = searchParams.get('month');
-  const month = monthParam === 'csat' || monthParam === '' || monthParam === null ? null : Number(monthParam);
-  const page = Number(searchParams.get('page'));
+  const id = searchParams.get('id');
 
-  if (!year || !page) {
-    return NextResponse.json({ error: '연도와 페이지가 필요합니다.' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: '문항 id가 필요합니다.' }, { status: 400 });
   }
 
-  const base64 = await getExamPageImage(year, month, page);
+  const base64 = await getExamQuestionImage(id);
   if (!base64) {
     return NextResponse.json({ error: '이미지를 찾을 수 없어요.' }, { status: 404 });
   }
