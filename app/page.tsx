@@ -165,8 +165,7 @@ export default function Home() {
               <span className="text-[10px] text-[#1c1a16]/40">학습 도우미</span>
             </span>
             <h1 className="font-display text-3xl font-black leading-none sm:text-5xl">
-              한국사<span className="ml-2 text-[#c1392d]">·</span>
-              <span className="text-[#1f7a7a]">학습</span> 도우미
+              한국사 <span className="text-[#1f7a7a]">학습</span> 도우미
             </h1>
             <p className="mt-3 max-w-2xl text-sm text-[#1c1a16]/65">
               교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
