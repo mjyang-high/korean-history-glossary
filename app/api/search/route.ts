@@ -26,11 +26,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '단어가 너무 길어요.' }, { status: 400 });
   }
 
-  await incrementSearchCount(term);
-
   const [cached, examInfo] = await Promise.all([getCachedTerm(term), lookupExamTerm(term)]);
 
   if (cached) {
+    await incrementSearchCount(term);
     return NextResponse.json({
       term,
       explanation: cached.explanation,
@@ -42,12 +41,16 @@ export async function POST(req: NextRequest) {
 
   const pages = await findPagesContaining(term);
   if (pages.length === 0) {
+    // 교과서에서 찾지 못한 단어는 인기 검색어 순위에 올리지 않는다.
+    // (욕설ㆍ외설적 단어를 검색해도 공개 순위에 노출되지 않도록 하기 위함)
     return NextResponse.json({
       term,
       notFound: true,
       examInfo,
     });
   }
+
+  await incrementSearchCount(term);
 
   const contexts = buildContexts(pages, term);
 
