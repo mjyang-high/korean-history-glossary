@@ -22,6 +22,44 @@ const MANUAL_PAIRS: Record<string, string> = {
   'his_main_mun_TA2XTK3Y.pdf': 'his_main_hsj_Y27E8133.pdf', // 2026-3
 };
 
+// PDF 텍스트 항목에는 단어 사이 공백이 이미 별도 항목(" ")으로 들어있는 경우가 많아,
+// 항목마다 공백을 강제로 끼워 넣으면 "( 가 )"처럼 부자연스럽게 띄어 써진다.
+// 줄바꿈(hasEOL)은 대부분 양쪽 정렬로 인한 단어 중간 줄바꿈(공백 없음)이라 그대로 이어붙이고,
+// 줄이 우측 여백까지 차지 않고 일찍 끝난 경우(문장/항목의 실제 끝)에만 공백을 넣는다.
+function joinPageTextItems(items: any[]): string {
+  // 페이지 전체에서 줄이 도달하는 가장 오른쪽 끝(본문의 실제 우측 여백)을 먼저 구해둔다.
+  // 첫 줄(머리말 등 짧은 줄)부터 시작해 누적으로 계산하면 첫 줄 자체가 기준이 되어버려
+  // "짧은 줄"을 못 걸러내는 문제가 생기므로, 전체를 한 번 훑어 미리 고정값으로 구한다.
+  let maxLineEndX = 0;
+  for (const item of items) {
+    if (!item.str) continue;
+    const endX = item.transform[4] + (item.width ?? 0);
+    if (endX > maxLineEndX) maxLineEndX = endX;
+  }
+
+  let result = '';
+  let prevEndX: number | null = null;
+
+  for (const item of items) {
+    const str: string = item.str ?? '';
+    if (str !== '') {
+      result += str;
+      prevEndX = item.transform[4] + (item.width ?? 0);
+    }
+    // hasEOL은 빈 문자열의 별도 항목으로 오기도 하고, 줄의 마지막 실제 글자 항목에
+    // 곧바로 표시되기도 한다 — 두 경우 모두 처리해야 한다.
+    // 줄이 우측 끝까지 거의 다 찼으면 줄바꿈으로 인한 이어짐(공백 없음),
+    // 짧게 끝났으면 문장/항목의 실제 끝(공백 필요)으로 본다.
+    if (item.hasEOL) {
+      const isFullLine = prevEndX !== null && maxLineEndX > 0 && prevEndX >= maxLineEndX * 0.92;
+      if (!isFullLine && !result.endsWith(' ')) {
+        result += ' ';
+      }
+    }
+  }
+  return result;
+}
+
 async function extractText(filePath: string): Promise<{ text: string; numPages: number }> {
   const data = new Uint8Array(fs.readFileSync(filePath));
   const doc = await pdfjsLib.getDocument({
@@ -36,7 +74,7 @@ async function extractText(filePath: string): Promise<{ text: string; numPages: 
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
     const tc = await page.getTextContent();
-    text += ' ' + tc.items.map((it: any) => it.str).join(' ');
+    text += ' ' + joinPageTextItems(tc.items as any[]);
   }
   return { text: text.replace(/\s+/g, ' ').trim(), numPages: doc.numPages };
 }
