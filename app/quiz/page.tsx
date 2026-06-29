@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
 import { SchoolBadge } from '@/components/SchoolBadge';
+import { SiteFooter } from '@/components/SiteFooter';
 
 interface ExamRound {
   year: number;
@@ -144,6 +145,7 @@ export default function QuizPage() {
               </Link>
             </div>
           </FrameCard>
+          <SiteFooter />
         </main>
       );
     }
@@ -218,6 +220,7 @@ export default function QuizPage() {
             </div>
           )}
         </FrameCard>
+        <SiteFooter />
       </main>
     );
   }
@@ -231,7 +234,7 @@ export default function QuizPage() {
             <span>모의고사 대비</span>
             <span className="text-[10px] text-[#1c1a16]/40">기출문제</span>
           </span>
-          <SchoolBadge />
+          <SchoolBadge className="hidden sm:block" />
         </div>
         <h1 className="font-display text-3xl font-black">
           기출문제 <span className="text-[#c1392d]">풀어보기</span>
@@ -303,6 +306,7 @@ export default function QuizPage() {
           메인으로 돌아가기
         </Link>
       </FrameCard>
+      <SiteFooter />
     </main>
   );
 }

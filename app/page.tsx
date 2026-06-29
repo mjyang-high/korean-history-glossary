@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
 import { HistoryMotifRow } from '@/components/HistoryMotifs';
 import { SchoolBadge } from '@/components/SchoolBadge';
+import { SiteFooter } from '@/components/SiteFooter';
 
 interface ContextSnippet {
   book: string;
@@ -120,7 +121,7 @@ export default function Home() {
 
   if (!authed) {
     return (
-      <main className="flex h-screen items-center justify-center bg-[#f4efe3] px-4">
+      <main className="relative flex h-screen items-center justify-center bg-[#f4efe3] px-4">
         <FrameCard className="w-full max-w-sm p-8">
           <span className="mx-auto mb-6 block w-fit rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
             반 전용 입장
@@ -148,6 +149,9 @@ export default function Home() {
             </button>
           </form>
         </FrameCard>
+        <div className="absolute bottom-0 left-0 right-0">
+          <SiteFooter />
+        </div>
       </main>
     );
   }
@@ -169,9 +173,9 @@ export default function Home() {
               교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
             </p>
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-3">
+          <div className="hidden shrink-0 flex-col items-end gap-3 sm:flex">
             <SchoolBadge />
-            <HistoryMotifRow className="hidden sm:flex" />
+            <HistoryMotifRow />
           </div>
         </div>
 
@@ -245,6 +249,7 @@ export default function Home() {
           )}
         </FrameCard>
       </div>
+      <SiteFooter />
     </main>
   );
 }
