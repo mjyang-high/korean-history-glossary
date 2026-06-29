@@ -65,11 +65,14 @@ function findQuestionMarkers(pageText: string, startN: number, endN: number) {
   const found: { n: number; charOffset: number }[] = [];
   let searchFrom = 0;
   for (let n = startN; n <= endN; n++) {
-    const re = new RegExp(`(?:^|[^0-9])(${n})\\s*\\.\\s*[^0-9]`);
+    // 'd' 플래그로 캡처 그룹의 정확한 위치를 가져온다. match[0].indexOf(String(n))는
+    // 매칭 문자열 안에 n과 같은 숫자가 더 앞에 또 나오면(머리말 등) 잘못 짚을 수 있다.
+    const re = new RegExp(`(?:^|[^0-9])(${n})\\s*\\.\\s*[^0-9]`, 'd');
     const slice = pageText.slice(searchFrom);
-    const match = slice.match(re);
+    const match = slice.match(re) as (RegExpMatchArray & { indices?: Array<[number, number]> }) | null;
     if (!match || match.index === undefined) break;
-    const offset = searchFrom + match.index + match[0].indexOf(String(n));
+    const groupStart = match.indices?.[1]?.[0];
+    const offset = searchFrom + (groupStart !== undefined ? groupStart : match.index + match[0].indexOf(String(n)));
     found.push({ n, charOffset: offset });
     searchFrom = offset + 1;
   }

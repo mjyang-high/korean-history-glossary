@@ -11,7 +11,9 @@ const OUT_PATH = path.join(process.cwd(), 'data', 'exam_questions.json');
 const CIRCLES = ['①', '②', '③', '④', '⑤'];
 
 // 같은 회차의 중복/다른 유형(홀수형 등) 문제지 - 선택지 순서가 달라 정답 번호가 틀릴 위험이 있어 제외
-const SKIP_MUN_FILES = new Set(['his_main_mun_A515UN97.pdf']);
+// (A515UN97은 과거에 2024-9 중복으로 의심해 제외했었지만, 실제로는 표지 회차 인식 버그로
+// 다른 회차(2025-9)와 혼동된 것이었음이 확인되어 더 이상 제외하지 않는다.)
+const SKIP_MUN_FILES = new Set<string>([]);
 
 // 3월/11월 학력평가 해설지는 표지에 "OOOO학년도 N월" 문구가 없어 자동 매칭이 안 된다.
 // 문제지 Q1~Q2 내용과 해설지 [출제의도] 내용을 직접 대조해 확인한 수동 매칭.
@@ -85,8 +87,14 @@ function estimatePageNo(questionNumber: number, numPages: number, totalQuestions
   return Math.min(numPages, Math.ceil(questionNumber / perPage));
 }
 
+// 일부 문제지는 문항 본문 안에 다른 회차의 "YYYY학년도 N월" 문구가 우연히 섞여 있어
+// (예: 자료에 등장하는 연도가 마침 학력평가 표기와 같은 형태), 본문에서 처음 만나는
+// "학년도" 문구를 그대로 믿으면 회차를 잘못 인식할 수 있다.
+// 실제 표지에는 "OO교시 한국사 영역YYYY학년도 N월"처럼 "교시" 바로 뒤에 표기되므로,
+// 그 패턴을 우선 찾고 없으면 첫 매칭으로 대체한다.
 function extractYearMonth(text: string): { year: number | null; month: number | null; examName: string } {
-  const m = text.match(/(\d{4})\s*학년도\s*(?:(\d{1,2})\s*월\s*)?/);
+  const coverMatch = text.match(/교시[^0-9]{0,15}(\d{4})\s*학년도\s*(?:(\d{1,2})\s*월\s*)?/);
+  const m = coverMatch ?? text.match(/(\d{4})\s*학년도\s*(?:(\d{1,2})\s*월\s*)?/);
   if (!m) return { year: null, month: null, examName: '미확인 시험' };
   const year = parseInt(m[1], 10);
   const month = m[2] ? parseInt(m[2], 10) : null;
@@ -95,17 +103,49 @@ function extractYearMonth(text: string): { year: number | null; month: number | 
 }
 
 // "1. ... ① ... ② ... ③ ... ④ ... ⑤ ..." 형태를, 1~20번이 순서대로 등장하는 지점만 골라 분리한다.
+//
+// 일부 문항은 본문 안에 "1. 유적 명칭 2. 탐구 목적 3. 탐구 내용"처럼 자체적으로 번호가 매겨진
+// 목록을 포함하는데, 이게 우연히 다음 문항 번호("2.", "3." 등)와 패턴이 같아 혼동될 수 있다.
+// 그래서 후보 위치를 찾으면, 직전 문항 시작점부터 후보 위치까지의 구간에 선택지 동그라미
+// (①~⑤)가 5개 이상 들어있는지 확인한다 — 진짜 문항이라면 그 구간에 직전 문항의 5개 선택지가
+// 모두 들어있어야 하기 때문이다. 부족하면 본문 속 목록일 가능성이 높으므로 건너뛰고 더 뒤에서
+// 같은 번호의 다음 후보를 찾는다.
 function splitBySequentialNumber(text: string, markerAfterNumber: RegExp, maxN = 20) {
   const blocks: { n: number; start: number; end: number }[] = [];
+  let prevStart = 0;
   let searchFrom = 0;
+
   for (let n = 1; n <= maxN; n++) {
-    const re = new RegExp(`(?:^|[^0-9])(${n})\\s*\\.\\s*${markerAfterNumber.source}`);
-    const slice = text.slice(searchFrom);
-    const match = slice.match(re);
-    if (!match || match.index === undefined) break;
-    const start = searchFrom + match.index + match[0].indexOf(String(n));
-    blocks.push({ n, start, end: text.length });
-    searchFrom = start + 1;
+    const re = new RegExp(`(?:^|[^0-9])(${n})\\s*\\.\\s*${markerAfterNumber.source}`, 'd');
+    let cursor = searchFrom;
+    let accepted: number | null = null;
+
+    while (true) {
+      const slice = text.slice(cursor);
+      const match = slice.match(re) as (RegExpMatchArray & { indices?: Array<[number, number]> }) | null;
+      if (!match || match.index === undefined) break;
+      const groupStart = match.indices?.[1]?.[0];
+      const candidate = cursor + (groupStart !== undefined ? groupStart : match.index + match[0].indexOf(String(n)));
+
+      // n=1은 비교할 "직전 문항"이 없으니 첫 매칭을 그대로 받아들인다.
+      if (n === 1) {
+        accepted = candidate;
+        break;
+      }
+      const span = text.slice(prevStart, candidate);
+      const circleCount = (span.match(/[①②③④⑤]/g) ?? []).length;
+      if (circleCount >= 5) {
+        accepted = candidate;
+        break;
+      }
+      // 선택지가 부족한 가짜 후보 - 본문 속 목록일 가능성이 높으니 건너뛰고 계속 찾는다.
+      cursor = candidate + 1;
+    }
+
+    if (accepted === null) break;
+    blocks.push({ n, start: accepted, end: text.length });
+    prevStart = accepted;
+    searchFrom = accepted + 1;
   }
   for (let i = 0; i < blocks.length - 1; i++) {
     blocks[i].end = blocks[i + 1].start;

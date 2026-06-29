@@ -1,4 +1,10 @@
 [
+  { "year": 2025, "month": 9, "number": 4, "wrongRate": 47.6 },
+  { "year": 2025, "month": 9, "number": 17, "wrongRate": 42.7 },
+  { "year": 2025, "month": 9, "number": 12, "wrongRate": 42.1 },
+  { "year": 2025, "month": 9, "number": 20, "wrongRate": 39.6 },
+  { "year": 2025, "month": 9, "number": 16, "wrongRate": 37.4 },
+
   { "year": 2026, "month": 6, "number": 7, "wrongRate": 65.7 },
   { "year": 2026, "month": 6, "number": 3, "wrongRate": 55.1 },
   { "year": 2026, "month": 6, "number": 18, "wrongRate": 50.6 },
