@@ -14,12 +14,13 @@ export async function POST(req: NextRequest) {
   }
 
   const res = NextResponse.json({ ok: true });
+  // maxAge를 주지 않으면 세션 쿠키가 되어 브라우저(창)를 완전히 닫으면 사라진다.
+  // 같은 기기라도 창을 닫고 다시 열면 비밀번호를 다시 입력하게 하기 위함.
   res.cookies.set(AUTH_COOKIE_NAME, await expectedAuthToken(), {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    maxAge: 60 * 60 * 24 * 30,
   });
   return res;
 }
