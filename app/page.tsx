@@ -124,20 +124,20 @@ export default function Home() {
       <main className="relative flex h-screen items-center justify-center bg-[#f4efe3] px-4">
         <FrameCard className="w-full max-w-sm p-8">
           <span className="mx-auto mb-6 block w-fit rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] tracking-wide text-[#1c1a16]/60">
-            반 전용 입장
+            대진고 학생 전용
           </span>
           <h1 className="font-display text-center text-3xl font-black leading-tight">
             한국사<br />학습 도우미
           </h1>
           <p className="mt-3 text-center text-sm text-[#1c1a16]/60">
-            반 비밀번호를 입력하면 검색할 수 있어요.
+            학교번호를 입력하면 검색할 수 있어요.
           </p>
           <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-3">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호"
+              placeholder="학교번호"
               className="rounded-xl border-2 border-[#1c1a16]/30 bg-white px-4 py-2.5 outline-none focus:border-[#c1392d]"
             />
             {authError && <p className="text-sm text-[#c1392d]">{authError}</p>}
