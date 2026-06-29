@@ -305,6 +305,18 @@ async function renderQuestionsOnPage(
   return { foundNumbers: markers.map((m) => m.n), images };
 }
 
+// 그림ㆍ도표가 있는 문항은 자료 내용이 이미지 카드에 그대로 보이므로, 발문 텍스트에서는
+// 마지막 물음표(와 바로 뒤에 붙는 [N점] 배점 표기)까지만 남기고 자료를 설명하는 나머지
+// 글은 잘라낸다. 이미지가 없는(순수 텍스트 자료) 문항은 그 텍스트가 유일한 근거이므로 그대로 둔다.
+function truncateStemToInstruction(stem: string): string {
+  const qIdx = stem.indexOf('?');
+  if (qIdx === -1) return stem;
+  let end = qIdx + 1;
+  const scoreMatch = stem.slice(end).match(/^\s*\[\s*\d+\s*점\s*\]/);
+  if (scoreMatch) end += scoreMatch[0].length;
+  return stem.slice(0, end).trim();
+}
+
 async function main() {
   if (!fs.existsSync(META_PATH)) {
     console.log('data/exam_rounds_meta.json이 없습니다. 먼저 npx tsx scripts/parse-exam-pdfs.ts를 실행하세요.');
@@ -313,6 +325,7 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const rounds: RoundMeta[] = JSON.parse(fs.readFileSync(META_PATH, 'utf-8'));
+  const questionIdsWithImage = new Set<string>();
 
   for (const round of rounds) {
     const filePath = path.join(SOURCE_DIR, round.munFile);
@@ -340,6 +353,7 @@ async function main() {
       for (const img of images) {
         const id = `${round.year}-${round.month ?? 'csat'}-${img.number}`;
         fs.writeFileSync(path.join(OUT_DIR, `${id}.png`), img.buffer);
+        questionIdsWithImage.add(id);
       }
       if (foundNumbers.length > 0) {
         nextN = Math.max(...foundNumbers) + 1;
@@ -354,6 +368,23 @@ async function main() {
   }
 
   console.log('\n모든 문항 이미지 잘라내기 완료.');
+
+  const QUESTIONS_PATH = path.join(process.cwd(), 'data', 'exam_questions.json');
+  if (fs.existsSync(QUESTIONS_PATH)) {
+    const questions: { id: string; stem: string }[] = JSON.parse(fs.readFileSync(QUESTIONS_PATH, 'utf-8'));
+    let changed = 0;
+    for (const q of questions) {
+      if (questionIdsWithImage.has(q.id)) {
+        const truncated = truncateStemToInstruction(q.stem);
+        if (truncated !== q.stem) {
+          q.stem = truncated;
+          changed++;
+        }
+      }
+    }
+    fs.writeFileSync(QUESTIONS_PATH, JSON.stringify(questions, null, 2), 'utf-8');
+    console.log(`그림이 있는 문항 ${changed}개의 발문에서 자료 설명 텍스트를 잘라냈습니다.`);
+  }
 }
 
 main().catch((err) => {
