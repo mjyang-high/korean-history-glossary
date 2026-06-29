@@ -128,6 +128,10 @@ export default function Home() {
           <h1 className="font-display text-center text-3xl font-black leading-tight">
             한국사<br />학습 도우미
           </h1>
+          <p className="font-display mt-2 text-center text-base font-bold tracking-tight sm:text-lg">
+            <span className="text-[#c1392d]">모르는 용어</span>부터{' '}
+            <span className="text-[#1f7a7a]">모고 기출</span>까지
+          </p>
           <p className="mt-3 text-center text-sm text-[#1c1a16]/60">
             학교번호를 입력하면 검색할 수 있어요.
           </p>
@@ -167,6 +171,10 @@ export default function Home() {
             <h1 className="font-display text-3xl font-black leading-none sm:text-5xl">
               한국사 <span className="text-[#1f7a7a]">학습</span> 도우미
             </h1>
+            <p className="font-display mt-2 text-lg font-bold tracking-tight sm:text-xl">
+              <span className="text-[#c1392d]">모르는 용어</span>부터{' '}
+              <span className="text-[#1f7a7a]">모고 기출</span>까지
+            </p>
             <p className="mt-3 max-w-2xl text-sm text-[#1c1a16]/65">
               교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
             </p>
