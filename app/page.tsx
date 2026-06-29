@@ -126,7 +126,7 @@ export default function Home() {
             반 전용 입장
           </span>
           <h1 className="font-display text-center text-3xl font-black leading-tight">
-            한국사<br />용어 도우미
+            한국사<br />학습 도우미
           </h1>
           <p className="mt-3 text-center text-sm text-[#1c1a16]/60">
             반 비밀번호를 입력하면 검색할 수 있어요.
@@ -159,11 +159,11 @@ export default function Home() {
           <div className="min-w-0">
             <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
               <span>교과서 내</span>
-              <span className="text-[10px] text-[#1c1a16]/40">용어 도우미</span>
+              <span className="text-[10px] text-[#1c1a16]/40">학습 도우미</span>
             </span>
             <h1 className="font-display text-3xl font-black leading-none sm:text-5xl">
               한국사<span className="ml-2 text-[#c1392d]">·</span>
-              <span className="text-[#1f7a7a]">용어</span> 도우미
+              <span className="text-[#1f7a7a]">학습</span> 도우미
             </h1>
             <p className="mt-3 max-w-2xl text-sm text-[#1c1a16]/65">
               교과서에 나온 단어 중 모르는 게 있으면 검색해보세요. 내각, 관제, 공화정, 결사 같은 단어도 좋아요.
