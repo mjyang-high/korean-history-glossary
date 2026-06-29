@@ -24,6 +24,7 @@ interface ExamQuestion {
   answer: number | null;
   explanation: string;
   wrongRate: number | null;
+  pageNo: number | null;
 }
 
 type Mode = 'top5' | 'all';
@@ -158,6 +159,17 @@ export default function QuizPage() {
         </div>
 
         <FrameCard className="p-6 sm:p-8">
+          {q.pageNo && (
+            <div className="mb-4">
+              <p className="mb-1.5 text-xs text-[#1c1a16]/40">원본 문제지 (사진ㆍ지도ㆍ표 포함)</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/exam-page-image?year=${q.year}&month=${q.month ?? 'csat'}&page=${q.pageNo}`}
+                alt={`${q.examName} ${q.pageNo}페이지 원본`}
+                className="w-full rounded-lg border border-[#1c1a16]/15"
+              />
+            </div>
+          )}
           <p className="font-display text-lg font-bold leading-relaxed">
             {q.number}. {q.stem}
           </p>

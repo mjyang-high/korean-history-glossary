@@ -12,6 +12,7 @@ export interface ExamQuestion {
   answer: number | null;
   explanation: string;
   wrongRate: number | null;
+  pageNo: number | null;
 }
 
 export interface ExamRound {
@@ -42,6 +43,7 @@ async function loadAll(): Promise<ExamQuestion[]> {
     answer: q.answer,
     explanation: q.explanation,
     wrongRate: lookupWrongRate(q.year, q.month, q.number),
+    pageNo: q.page_no,
   }));
   cacheLoadedAt = now;
   return cache;

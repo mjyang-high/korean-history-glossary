@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
+    "@napi-rs/canvas": "^1.0.1",
     "@neondatabase/serverless": "^0.10.4",
     "next": "14.2.35",
     "pdf-parse": "^1.1.1",

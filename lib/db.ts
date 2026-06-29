@@ -64,10 +64,22 @@ export async function ensureSchema() {
       stem TEXT NOT NULL,
       choices_json TEXT NOT NULL,
       answer INTEGER,
-      explanation TEXT NOT NULL
+      explanation TEXT NOT NULL,
+      page_no INTEGER
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_exam_questions_round ON exam_questions(year, month)`;
+  await sql`ALTER TABLE exam_questions ADD COLUMN IF NOT EXISTS page_no INTEGER`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS exam_pages (
+      id TEXT PRIMARY KEY,
+      year INTEGER NOT NULL,
+      month INTEGER,
+      page_no INTEGER NOT NULL,
+      image_base64 TEXT NOT NULL
+    )
+  `;
 
   initialized = true;
 }
@@ -157,6 +169,7 @@ export interface ExamQuestionRow {
   choices_json: string;
   answer: number | null;
   explanation: string;
+  page_no: number | null;
 }
 
 export async function clearExamQuestions() {
@@ -174,11 +187,12 @@ export async function insertExamQuestion(q: {
   choices: string[];
   answer: number | null;
   explanation: string;
+  pageNo: number | null;
 }) {
   await ensureSchema();
   await sql`
-    INSERT INTO exam_questions (id, year, month, exam_name, number, stem, choices_json, answer, explanation)
-    VALUES (${q.id}, ${q.year}, ${q.month}, ${q.examName}, ${q.number}, ${q.stem}, ${JSON.stringify(q.choices)}, ${q.answer}, ${q.explanation})
+    INSERT INTO exam_questions (id, year, month, exam_name, number, stem, choices_json, answer, explanation, page_no)
+    VALUES (${q.id}, ${q.year}, ${q.month}, ${q.examName}, ${q.number}, ${q.stem}, ${JSON.stringify(q.choices)}, ${q.answer}, ${q.explanation}, ${q.pageNo})
     ON CONFLICT (id) DO UPDATE SET
       year = EXCLUDED.year,
       month = EXCLUDED.month,
@@ -187,7 +201,8 @@ export async function insertExamQuestion(q: {
       stem = EXCLUDED.stem,
       choices_json = EXCLUDED.choices_json,
       answer = EXCLUDED.answer,
-      explanation = EXCLUDED.explanation
+      explanation = EXCLUDED.explanation,
+      page_no = EXCLUDED.page_no
   `;
 }
 
@@ -195,4 +210,30 @@ export async function getAllExamQuestions(): Promise<ExamQuestionRow[]> {
   await ensureSchema();
   const rows = await sql`SELECT * FROM exam_questions ORDER BY year DESC, month DESC, number ASC`;
   return rows as unknown as ExamQuestionRow[];
+}
+
+export async function clearExamPages() {
+  await ensureSchema();
+  await sql`DELETE FROM exam_pages`;
+}
+
+export async function insertExamPage(id: string, year: number, month: number | null, pageNo: number, imageBase64: string) {
+  await ensureSchema();
+  await sql`
+    INSERT INTO exam_pages (id, year, month, page_no, image_base64)
+    VALUES (${id}, ${year}, ${month}, ${pageNo}, ${imageBase64})
+    ON CONFLICT (id) DO UPDATE SET
+      year = EXCLUDED.year,
+      month = EXCLUDED.month,
+      page_no = EXCLUDED.page_no,
+      image_base64 = EXCLUDED.image_base64
+  `;
+}
+
+export async function getExamPageImage(year: number, month: number | null, pageNo: number): Promise<string | null> {
+  await ensureSchema();
+  const id = `${year}-${month ?? 'csat'}-${pageNo}`;
+  const rows = await sql`SELECT image_base64 FROM exam_pages WHERE id = ${id}`;
+  const row = (rows as unknown as { image_base64: string }[])[0];
+  return row ? row.image_base64 : null;
 }

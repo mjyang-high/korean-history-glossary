@@ -22,7 +22,7 @@ const MANUAL_PAIRS: Record<string, string> = {
   'his_main_mun_TA2XTK3Y.pdf': 'his_main_hsj_Y27E8133.pdf', // 2026-3
 };
 
-async function extractText(filePath: string): Promise<string> {
+async function extractText(filePath: string): Promise<{ text: string; numPages: number }> {
   const data = new Uint8Array(fs.readFileSync(filePath));
   const doc = await pdfjsLib.getDocument({
     data,
@@ -38,7 +38,13 @@ async function extractText(filePath: string): Promise<string> {
     const tc = await page.getTextContent();
     text += ' ' + tc.items.map((it: any) => it.str).join(' ');
   }
-  return text.replace(/\s+/g, ' ').trim();
+  return { text: text.replace(/\s+/g, ' ').trim(), numPages: doc.numPages };
+}
+
+// 문제지는 20문제가 페이지마다 균등하게(예: 4페이지 x 5문제) 배치된다고 가정해 페이지 번호를 추정한다.
+function estimatePageNo(questionNumber: number, numPages: number, totalQuestions = 20): number {
+  const perPage = Math.ceil(totalQuestions / numPages);
+  return Math.min(numPages, Math.ceil(questionNumber / perPage));
 }
 
 function extractYearMonth(text: string): { year: number | null; month: number | null; examName: string } {
@@ -179,6 +185,8 @@ interface ExamQuestion {
   answer: number | null;
   explanation: string;
   wrongRate: number | null;
+  pageNo: number;
+  pageImageKey: string;
   sourceFiles: { mun: string; hsj: string };
 }
 
@@ -203,26 +211,28 @@ async function main() {
     month: number | null;
     examName: string;
     text: string;
+    numPages: number;
   };
 
   const munParsed: Parsed[] = [];
   for (const f of munFiles) {
-    const text = await extractText(path.join(DIR, f));
+    const { text, numPages } = await extractText(path.join(DIR, f));
     const { year, month, examName } = extractYearMonth(text);
-    munParsed.push({ file: f, year, month, examName, text });
-    console.log(`[문제지] ${f} -> ${examName} (${text.length}자)`);
+    munParsed.push({ file: f, year, month, examName, text, numPages });
+    console.log(`[문제지] ${f} -> ${examName} (${text.length}자, ${numPages}페이지)`);
   }
 
   const hsjParsed: Parsed[] = [];
   for (const f of hsjFiles) {
-    const text = await extractText(path.join(DIR, f));
+    const { text, numPages } = await extractText(path.join(DIR, f));
     const { year, month, examName } = extractYearMonth(text);
-    hsjParsed.push({ file: f, year, month, examName, text });
+    hsjParsed.push({ file: f, year, month, examName, text, numPages });
     console.log(`[해설지] ${f} -> ${examName} (${text.length}자)`);
   }
 
   const results: ExamQuestion[] = [];
   const unmatched: string[] = [];
+  const roundsMeta: { year: number; month: number | null; munFile: string; numPages: number }[] = [];
 
   for (const mun of munParsed) {
     if (mun.year === null) {
@@ -244,6 +254,7 @@ async function main() {
     const explanationMap = new Map(explanations.map((e) => [e.number, e.explanation]));
 
     for (const q of questions) {
+      const pageNo = estimatePageNo(q.number, mun.numPages);
       results.push({
         id: `${mun.year}-${mun.month ?? 'csat'}-${q.number}`,
         year: mun.year,
@@ -255,9 +266,13 @@ async function main() {
         answer: answerKey.get(q.number) ?? null,
         explanation: explanationMap.get(q.number) ?? '',
         wrongRate: null,
+        pageNo,
+        pageImageKey: `${mun.year}-${mun.month ?? 'csat'}-${pageNo}`,
         sourceFiles: { mun: mun.file, hsj: hsj.file },
       });
     }
+
+    roundsMeta.push({ year: mun.year, month: mun.month, munFile: mun.file, numPages: mun.numPages });
 
     console.log(
       `매칭 완료: ${mun.examName} - 문제 ${questions.length}개 / 정답 ${answerKey.size}개 / 해설 ${explanations.length}개`
@@ -266,6 +281,9 @@ async function main() {
 
   fs.writeFileSync(OUT_PATH, JSON.stringify(results, null, 2), 'utf-8');
   console.log(`\n총 ${results.length}문제 저장 완료: ${OUT_PATH}`);
+
+  const META_PATH = path.join(process.cwd(), 'data', 'exam_rounds_meta.json');
+  fs.writeFileSync(META_PATH, JSON.stringify(roundsMeta, null, 2), 'utf-8');
 
   if (unmatched.length > 0) {
     console.log('\n⚠ 매칭 실패:');

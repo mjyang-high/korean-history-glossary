@@ -1,10 +1,11 @@
-// 사용법: scripts/parse-exam-pdfs.ts로 data/exam_questions.json을 만든 뒤 실행
+// 사용법: scripts/parse-exam-pdfs.ts -> scripts/render-exam-pages.ts 실행 후
 // npx tsx scripts/load-exam-questions.ts
 import fs from 'fs';
 import path from 'path';
-import { clearExamQuestions, insertExamQuestion } from '../lib/db';
+import { clearExamQuestions, insertExamQuestion, clearExamPages, insertExamPage } from '../lib/db';
 
 const JSON_PATH = path.join(process.cwd(), 'data', 'exam_questions.json');
+const PAGE_IMAGE_DIR = path.join(process.cwd(), 'data', 'exam-page-images');
 
 interface ExamQuestion {
   id: string;
@@ -16,6 +17,7 @@ interface ExamQuestion {
   choices: string[];
   answer: number | null;
   explanation: string;
+  pageNo: number | null;
 }
 
 async function main() {
@@ -30,8 +32,24 @@ async function main() {
   for (const q of questions) {
     await insertExamQuestion(q);
   }
-
   console.log(`${questions.length}문제를 DB에 저장했습니다.`);
+
+  if (fs.existsSync(PAGE_IMAGE_DIR)) {
+    const files = fs.readdirSync(PAGE_IMAGE_DIR).filter((f) => f.toLowerCase().endsWith('.png'));
+    await clearExamPages();
+    for (const file of files) {
+      const id = file.replace(/\.png$/i, '');
+      const [yearStr, monthStr, pageStr] = id.split('-');
+      const year = Number(yearStr);
+      const month = monthStr === 'csat' ? null : Number(monthStr);
+      const pageNo = Number(pageStr);
+      const base64 = fs.readFileSync(path.join(PAGE_IMAGE_DIR, file)).toString('base64');
+      await insertExamPage(id, year, month, pageNo, base64);
+    }
+    console.log(`${files.length}개 페이지 이미지를 DB에 저장했습니다.`);
+  } else {
+    console.log('data/exam-page-images 폴더가 없어 페이지 이미지는 건너뜁니다. (scripts/render-exam-pages.ts 먼저 실행)');
+  }
 }
 
 main().catch((err) => {
