@@ -160,7 +160,7 @@ export default function Home() {
       <FrameCard className="mb-8 px-6 py-7 sm:px-10">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
+            <span className="font-display mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
               <span>교과서 내</span>
               <span className="text-[10px] text-[#1c1a16]/40">학습 도우미</span>
             </span>
