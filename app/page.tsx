@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
 import { HistoryMotifRow } from '@/components/HistoryMotifs';
-import { SchoolBadge } from '@/components/SchoolBadge';
 import { SiteFooter } from '@/components/SiteFooter';
 
 interface ContextSnippet {
@@ -174,7 +173,6 @@ export default function Home() {
             </p>
           </div>
           <div className="hidden shrink-0 flex-col items-end gap-3 sm:flex">
-            <SchoolBadge />
             <HistoryMotifRow />
           </div>
         </div>

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FrameCard } from '@/components/FrameCard';
-import { SchoolBadge } from '@/components/SchoolBadge';
 import { SiteFooter } from '@/components/SiteFooter';
 
 interface ExamRound {
@@ -235,13 +234,10 @@ export default function QuizPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <FrameCard className="p-6 sm:p-8">
-        <div className="flex items-start justify-between gap-4">
-          <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
-            <span>모의고사 대비</span>
-            <span className="text-[10px] text-[#1c1a16]/40">기출문제</span>
-          </span>
-          <SchoolBadge className="hidden sm:block" />
-        </div>
+        <span className="mb-3 inline-flex flex-col items-center rounded-sm border border-[#1c1a16]/60 px-3 py-1 text-[11px] leading-tight tracking-wide text-[#1c1a16]/60">
+          <span>모의고사 대비</span>
+          <span className="text-[10px] text-[#1c1a16]/40">기출문제</span>
+        </span>
         <h1 className="font-display text-3xl font-black">
           기출문제 <span className="text-[#c1392d]">풀어보기</span>
         </h1>
