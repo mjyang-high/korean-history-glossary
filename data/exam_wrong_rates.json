@@ -1,1 +1,73 @@
-[]
+[
+  { "year": 2026, "month": 6, "number": 7, "wrongRate": 65.7 },
+  { "year": 2026, "month": 6, "number": 3, "wrongRate": 55.1 },
+  { "year": 2026, "month": 6, "number": 18, "wrongRate": 50.6 },
+  { "year": 2026, "month": 6, "number": 9, "wrongRate": 45.5 },
+  { "year": 2026, "month": 6, "number": 16, "wrongRate": 39.3 },
+
+  { "year": 2026, "month": 3, "number": 7, "wrongRate": 79.7 },
+  { "year": 2026, "month": 3, "number": 17, "wrongRate": 49.5 },
+  { "year": 2026, "month": 3, "number": 8, "wrongRate": 49.1 },
+  { "year": 2026, "month": 3, "number": 3, "wrongRate": 42.8 },
+  { "year": 2026, "month": 3, "number": 19, "wrongRate": 41.3 },
+
+  { "year": 2025, "month": 10, "number": 10, "wrongRate": 60.0 },
+  { "year": 2025, "month": 10, "number": 16, "wrongRate": 49.9 },
+  { "year": 2025, "month": 10, "number": 15, "wrongRate": 47.5 },
+  { "year": 2025, "month": 10, "number": 9, "wrongRate": 46.9 },
+  { "year": 2025, "month": 10, "number": 3, "wrongRate": 39.6 },
+
+  { "year": 2025, "month": 6, "number": 17, "wrongRate": 63.0 },
+  { "year": 2025, "month": 6, "number": 15, "wrongRate": 55.0 },
+  { "year": 2025, "month": 6, "number": 19, "wrongRate": 54.8 },
+  { "year": 2025, "month": 6, "number": 12, "wrongRate": 54.8 },
+  { "year": 2025, "month": 6, "number": 16, "wrongRate": 45.6 },
+
+  { "year": 2025, "month": 3, "number": 8, "wrongRate": 65.4 },
+  { "year": 2025, "month": 3, "number": 16, "wrongRate": 64.6 },
+  { "year": 2025, "month": 3, "number": 11, "wrongRate": 51.0 },
+  { "year": 2025, "month": 3, "number": 14, "wrongRate": 48.3 },
+  { "year": 2025, "month": 3, "number": 10, "wrongRate": 45.7 },
+
+  { "year": 2024, "month": 10, "number": 11, "wrongRate": 52.1 },
+  { "year": 2024, "month": 10, "number": 12, "wrongRate": 46.6 },
+  { "year": 2024, "month": 10, "number": 19, "wrongRate": 45.5 },
+  { "year": 2024, "month": 10, "number": 3, "wrongRate": 43.7 },
+  { "year": 2024, "month": 10, "number": 2, "wrongRate": 41.9 },
+
+  { "year": 2024, "month": 9, "number": 9, "wrongRate": 54.7 },
+  { "year": 2024, "month": 9, "number": 16, "wrongRate": 51.2 },
+  { "year": 2024, "month": 9, "number": 18, "wrongRate": 47.8 },
+  { "year": 2024, "month": 9, "number": 4, "wrongRate": 44.1 },
+  { "year": 2024, "month": 9, "number": 2, "wrongRate": 42.0 },
+
+  { "year": 2024, "month": 6, "number": 13, "wrongRate": 64.4 },
+  { "year": 2024, "month": 6, "number": 9, "wrongRate": 61.8 },
+  { "year": 2024, "month": 6, "number": 17, "wrongRate": 60.6 },
+  { "year": 2024, "month": 6, "number": 3, "wrongRate": 45.5 },
+  { "year": 2024, "month": 6, "number": 10, "wrongRate": 41.2 },
+
+  { "year": 2024, "month": 3, "number": 20, "wrongRate": 67.9 },
+  { "year": 2024, "month": 3, "number": 5, "wrongRate": 64.1 },
+  { "year": 2024, "month": 3, "number": 18, "wrongRate": 57.2 },
+  { "year": 2024, "month": 3, "number": 11, "wrongRate": 55.4 },
+  { "year": 2024, "month": 3, "number": 6, "wrongRate": 55.0 },
+
+  { "year": 2023, "month": 9, "number": 14, "wrongRate": 60.1 },
+  { "year": 2023, "month": 9, "number": 16, "wrongRate": 58.2 },
+  { "year": 2023, "month": 9, "number": 6, "wrongRate": 52.6 },
+  { "year": 2023, "month": 9, "number": 2, "wrongRate": 37.3 },
+  { "year": 2023, "month": 9, "number": 12, "wrongRate": 37.2 },
+
+  { "year": 2023, "month": 6, "number": 8, "wrongRate": 59.6 },
+  { "year": 2023, "month": 6, "number": 11, "wrongRate": 55.6 },
+  { "year": 2023, "month": 6, "number": 12, "wrongRate": 51.3 },
+  { "year": 2023, "month": 6, "number": 14, "wrongRate": 46.2 },
+  { "year": 2023, "month": 6, "number": 6, "wrongRate": 36.1 },
+
+  { "year": 2023, "month": 3, "number": 11, "wrongRate": 85.4 },
+  { "year": 2023, "month": 3, "number": 3, "wrongRate": 72.6 },
+  { "year": 2023, "month": 3, "number": 15, "wrongRate": 59.0 },
+  { "year": 2023, "month": 3, "number": 18, "wrongRate": 55.8 },
+  { "year": 2023, "month": 3, "number": 16, "wrongRate": 55.3 }
+]
